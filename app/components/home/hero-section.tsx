@@ -6,7 +6,6 @@ import {
   ArrowRight,
   Shield,
   Star,
-  ChevronRight,
   Play,
 } from "lucide-react";
 
@@ -21,21 +20,8 @@ export function HeroSection() {
       </div>
 
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        {/* Hero Top Announcement */}
-        <div className="flex justify-center">
-          <Link
-            href="/tools"
-            className="group inline-flex items-center gap-2 rounded-full border border-primary/20 bg-card/80 px-4 py-1.5 text-xs font-medium text-foreground shadow-sm backdrop-blur-md transition-all hover:border-primary/50 hover:bg-card"
-          >
-            <span className="flex h-2 w-2 rounded-full bg-primary animate-pulse" />
-            <span className="font-semibold text-primary">iUseDaily 2.0</span>
-            <span className="text-muted-foreground">The unified digital utility suite</span>
-            <ChevronRight className="h-3.5 w-3.5 text-muted-foreground transition-transform group-hover:translate-x-0.5" />
-          </Link>
-        </div>
-
         {/* Main Headline */}
-        <div className="mx-auto mt-8 max-w-4xl text-center">
+        <div className="mx-auto max-w-4xl text-center">
           <h1 className="text-4xl font-black tracking-tight text-foreground sm:text-6xl lg:text-7xl">
             The everyday OS for
             <br />

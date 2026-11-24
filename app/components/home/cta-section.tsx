@@ -4,7 +4,6 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
-  Sparkles,
   ArrowRight,
   ShieldCheck,
   Check,
@@ -35,12 +34,6 @@ export function CtaSection() {
           <div className="pointer-events-none absolute left-1/2 top-0 h-40 w-80 -translate-x-1/2 bg-gradient-to-b from-blue-500/20 to-transparent blur-2xl" />
 
           <div className="relative z-10 mx-auto max-w-3xl">
-            {/* Top Pill */}
-            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-blue-500/30 bg-blue-500/10 px-4 py-1.5 text-xs font-semibold text-blue-300 backdrop-blur-md">
-              <Sparkles className="h-3.5 w-3.5 text-blue-400" />
-              <span>Free forever tools • No credit card required</span>
-            </div>
-
             {/* Headline */}
             <h2 className="text-3xl font-black tracking-tight text-white sm:text-5xl lg:text-6xl">
               Ready to reclaim your

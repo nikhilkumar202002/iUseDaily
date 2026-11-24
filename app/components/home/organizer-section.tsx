@@ -3,7 +3,6 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import {
-  CalendarDays,
   CheckCircle2,
   Circle,
   Clock,
@@ -86,12 +85,7 @@ export function OrganizerSection() {
           
           {/* Left Column: SaaS Narrative & Value Props */}
           <div className="lg:col-span-5">
-            <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-3.5 py-1 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
-              <CalendarDays className="h-3.5 w-3.5" />
-              <span>Personal Command Center</span>
-            </div>
-
-            <h2 className="mt-4 text-3xl font-extrabold tracking-tight text-foreground sm:text-4xl lg:text-5xl">
+            <h2 className="text-3xl font-extrabold tracking-tight text-foreground sm:text-4xl lg:text-5xl">
               Turn chaos into a calm, focused workflow.
             </h2>
 

@@ -6,7 +6,6 @@ import {
   Sparkles,
   Bot,
   Send,
-  WandSparkles,
   Languages,
   FileCheck,
   ArrowRight,
@@ -193,12 +192,7 @@ export function AiSection() {
 
           {/* Right Column: Narrative & Capabilities */}
           <div className="order-1 lg:order-2 lg:col-span-5">
-            <div className="inline-flex items-center gap-2 rounded-full border border-purple-500/20 bg-purple-500/10 px-3.5 py-1 text-xs font-semibold text-purple-600 dark:text-purple-400">
-              <WandSparkles className="h-3.5 w-3.5" />
-              <span>Next-Gen AI Companion</span>
-            </div>
-
-            <h2 className="mt-4 text-3xl font-extrabold tracking-tight text-foreground sm:text-4xl lg:text-5xl">
+            <h2 className="text-3xl font-extrabold tracking-tight text-foreground sm:text-4xl lg:text-5xl">
               An AI that actually knows your workflow.
             </h2>
 
