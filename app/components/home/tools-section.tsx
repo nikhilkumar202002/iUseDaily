@@ -9,10 +9,11 @@ import {
   Calculator,
   ArrowRight,
   ArrowUpRight,
-  Sparkles,
   Scissors,
   Layers,
   Code2,
+  UploadCloud,
+  Zap,
 } from "lucide-react";
 
 type Category = "ALL" | "PDF" | "IMAGE" | "TEXT" | "CALCULATOR";
@@ -24,85 +25,102 @@ interface ToolItem {
   category: Category;
   icon: React.ComponentType<{ className?: string }>;
   badge?: string;
+  badgeColor?: string;
   href: string;
+  tagline?: string;
 }
 
 const allTools: ToolItem[] = [
   {
     id: "pdf-converter",
-    name: "PDF Converter",
-    description: "Convert Word, Excel, and image files to and from PDF without watermark.",
+    name: "Universal PDF Converter",
+    description: "Convert Word, PowerPoint, Excel, and images to/from PDF with zero data loss.",
     category: "PDF",
     icon: FileType,
-    badge: "Popular",
+    badge: "Most Used",
+    badgeColor: "bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20",
     href: "/tools",
+    tagline: "Ultra-fast client conversion",
   },
   {
     id: "image-compressor",
-    name: "Image Compressor",
-    description: "Compress JPG, PNG, and WebP images up to 80% while retaining quality.",
+    name: "Lossless Image Compressor",
+    description: "Shrink PNG, JPG, SVG and WebP file sizes by up to 85% without noticeable artifacting.",
     category: "IMAGE",
     icon: ImageIcon,
-    badge: "Fast",
+    badge: "Instant",
+    badgeColor: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20",
     href: "/tools",
+    tagline: "Batch multi-file support",
   },
   {
-    id: "merge-pdf",
-    name: "Merge & Split PDF",
-    description: "Combine multiple PDF documents into one or extract specific pages.",
-    category: "PDF",
-    icon: Layers,
-    href: "/tools",
-  },
-  {
-    id: "word-counter",
-    name: "Word & Character Counter",
-    description: "Count characters, words, sentences, reading time, and keyword density.",
-    category: "TEXT",
-    icon: FileText,
-    href: "/tools",
-  },
-  {
-    id: "percentage-calc",
-    name: "Percentage Calculator",
-    description: "Compute increases, decreases, fractions, discounts, and margin easily.",
-    category: "CALCULATOR",
-    icon: Calculator,
-    href: "/tools",
-  },
-  {
-    id: "background-remover",
-    name: "Background Remover",
-    description: "Automatically cut out backgrounds from photos with instant AI precision.",
+    id: "ai-background-remover",
+    name: "AI Background Remover",
+    description: "One-click neural network portrait and product cutouts with crisp alpha transparency.",
     category: "IMAGE",
     icon: Scissors,
     badge: "AI Powered",
+    badgeColor: "bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/20",
     href: "/tools",
+    tagline: "Studio quality edges",
   },
   {
-    id: "json-formatter",
-    name: "JSON Formatter & Validator",
-    description: "Beautify, validate, minify, and debug JSON payloads with color syntax.",
+    id: "merge-split-pdf",
+    name: "Merge, Split & Reorder PDF",
+    description: "Combine fragmented PDF files into a single bundle or extract selected ranges in seconds.",
+    category: "PDF",
+    icon: Layers,
+    badge: "Offline Ready",
+    badgeColor: "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20",
+    href: "/tools",
+    tagline: "Visual page organizer",
+  },
+  {
+    id: "word-character-counter",
+    name: "Smart Word & Text Analyzer",
+    description: "Inspect character density, reading level, keyword frequency, and estimated speaking duration.",
+    category: "TEXT",
+    icon: FileText,
+    href: "/tools",
+    tagline: "Real-time metrics",
+  },
+  {
+    id: "json-formatter-validator",
+    name: "JSON Formatter & Schema Validator",
+    description: "Tree inspection, linting, prettifying, and minifying for complex JSON/YAML payloads.",
     category: "TEXT",
     icon: Code2,
+    badge: "Dev Favorite",
+    badgeColor: "bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border-cyan-500/20",
     href: "/tools",
+    tagline: "Syntax highlighted output",
   },
   {
-    id: "unit-converter",
-    name: "Unit & Currency Converter",
-    description: "Convert units of length, weight, speed, temperature, and live currencies.",
+    id: "percentage-financial-calc",
+    name: "Percentage & Margin Engine",
+    description: "Quick calculations for markup, discounts, inflation compound interest, and VAT.",
     category: "CALCULATOR",
     icon: Calculator,
     href: "/tools",
+    tagline: "Precise decimal accuracy",
+  },
+  {
+    id: "unit-converter-pro",
+    name: "Scientific Unit & Rate Converter",
+    description: "Convert 200+ physical units, CSS rem/px values, data storage sizes, and live forex rates.",
+    category: "CALCULATOR",
+    icon: Calculator,
+    href: "/tools",
+    tagline: "Instant unit lookup",
   },
 ];
 
-const categories: { label: string; value: Category }[] = [
-  { label: "All Tools", value: "ALL" },
-  { label: "PDF Tools", value: "PDF" },
-  { label: "Image Utilities", value: "IMAGE" },
-  { label: "Text & Code", value: "TEXT" },
-  { label: "Calculators", value: "CALCULATOR" },
+const categoryTabs: { label: string; value: Category; count: number }[] = [
+  { label: "All Utilities", value: "ALL", count: 50 },
+  { label: "PDF Suite", value: "PDF", count: 14 },
+  { label: "Image Tools", value: "IMAGE", count: 12 },
+  { label: "Text & Code", value: "TEXT", count: 16 },
+  { label: "Calculators", value: "CALCULATOR", count: 8 },
 ];
 
 export function ToolsSection() {
@@ -111,87 +129,142 @@ export function ToolsSection() {
   const filteredTools =
     activeCategory === "ALL"
       ? allTools
-      : allTools.filter((tool) => tool.category === activeCategory);
+      : allTools.filter((t) => t.category === activeCategory);
 
   return (
-    <section className="border-y border-border bg-muted/40 px-4 py-20 sm:px-6 sm:py-24 lg:px-8">
-      <div className="mx-auto max-w-7xl">
-        {/* Header */}
+    <section className="relative border-y border-border bg-muted/30 py-24 sm:py-32">
+      {/* Background glow accent */}
+      <div className="pointer-events-none absolute left-1/2 top-1/2 -z-10 h-[500px] w-[800px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary/5 blur-3xl" />
+
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        {/* Section Header */}
         <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
-          <div>
-            <div className="mb-2 inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-primary">
-              <Sparkles className="h-3.5 w-3.5" />
-              Everyday Essentials
+          <div className="max-w-2xl">
+            <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-3.5 py-1 text-xs font-semibold text-primary">
+              <Zap className="h-3.5 w-3.5" />
+              <span>Core Utilities Engine</span>
             </div>
-            <h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-              Practical utilities built for speed.
+            <h2 className="text-3xl font-extrabold tracking-tight text-foreground sm:text-4xl lg:text-5xl">
+              High-speed utility tools.
+              <br />
+              <span className="text-muted-foreground font-semibold">Zero installation. Zero waiting.</span>
             </h2>
-            <p className="mt-3 max-w-xl text-sm leading-relaxed text-muted-foreground sm:text-base">
-              No software installations or accounts required. Pick a tool, get your work done
-              in seconds, and move on with your day.
+            <p className="mt-4 text-base leading-relaxed text-muted-foreground">
+              Built on WebAssembly and client-side processing. Your files never touch external servers,
+              providing instantaneous speeds and enterprise-grade confidentiality.
             </p>
           </div>
 
-          <Link
-            href="/tools"
-            className="group inline-flex items-center gap-2 text-sm font-semibold text-primary transition-all hover:text-primary/80"
-          >
-            <span>View all 50+ tools</span>
-            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-          </Link>
-        </div>
-
-        {/* Filter Pills */}
-        <div className="mt-8 flex flex-wrap gap-2 border-b border-border pb-4">
-          {categories.map((cat) => (
-            <button
-              key={cat.value}
-              type="button"
-              onClick={() => setActiveCategory(cat.value)}
-              className={`rounded-full px-4 py-1.5 text-xs font-medium transition-all ${
-                activeCategory === cat.value
-                  ? "bg-primary text-primary-foreground shadow-sm shadow-primary/20"
-                  : "bg-card text-muted-foreground hover:bg-muted hover:text-foreground border border-border"
-              }`}
+          <div className="flex items-center gap-3">
+            <Link
+              href="/tools"
+              className="group inline-flex items-center gap-2 rounded-full border border-border bg-card px-5 py-2.5 text-sm font-semibold text-foreground shadow-sm transition-all hover:border-primary/50 hover:bg-muted"
             >
-              {cat.label}
-            </button>
-          ))}
+              <span>Explore all 50+ tools</span>
+              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+            </Link>
+          </div>
         </div>
 
-        {/* Grid of Tools */}
-        <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {/* Interactive Dropzone Teaser Bar */}
+        <div className="mt-10 rounded-2xl border border-dashed border-primary/30 bg-primary/5 p-6 backdrop-blur-sm sm:p-8">
+          <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
+            <div className="flex items-center gap-4">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-md shadow-primary/25">
+                <UploadCloud className="h-6 w-6" />
+              </div>
+              <div>
+                <h4 className="text-sm font-bold text-foreground">Instant Quick-Convert Dropzone</h4>
+                <p className="text-xs text-muted-foreground">
+                  Drag and drop any PDF, Word document, PNG or JSON file here to launch the correct tool instantly.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <Link
+                href="/tools"
+                className="inline-flex items-center justify-center rounded-xl bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground shadow-sm hover:opacity-95"
+              >
+                Select File
+              </Link>
+            </div>
+          </div>
+        </div>
+
+        {/* Category Tabs */}
+        <div className="mt-10 flex flex-wrap gap-2 border-b border-border pb-4">
+          {categoryTabs.map((tab) => {
+            const isSelected = activeCategory === tab.value;
+            return (
+              <button
+                key={tab.value}
+                type="button"
+                onClick={() => setActiveCategory(tab.value)}
+                className={`flex items-center gap-2 rounded-full px-4 py-2 text-xs font-semibold transition-all ${
+                  isSelected
+                    ? "bg-foreground text-background shadow-md shadow-foreground/10"
+                    : "border border-border bg-card text-muted-foreground hover:bg-muted hover:text-foreground"
+                }`}
+              >
+                <span>{tab.label}</span>
+                <span
+                  className={`rounded-full px-1.5 py-0.2 text-[10px] ${
+                    isSelected ? "bg-background/20 text-background" : "bg-muted text-muted-foreground"
+                  }`}
+                >
+                  {tab.count}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Tools Grid */}
+        <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {filteredTools.map((tool) => {
             const Icon = tool.icon;
             return (
               <Link
                 key={tool.id}
                 href={tool.href}
-                className="group relative flex flex-col justify-between rounded-2xl border border-border bg-card p-6 transition-all duration-200 hover:-translate-y-1 hover:border-primary/40 hover:shadow-lg hover:shadow-primary/5"
+                className="group relative flex flex-col justify-between rounded-2xl border border-border/80 bg-card p-6 shadow-sm transition-all duration-200 hover:-translate-y-1.5 hover:border-primary/50 hover:shadow-xl hover:shadow-primary/5"
               >
                 <div>
-                  <div className="mb-5 flex items-center justify-between">
-                    <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-surface-blue text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
-                      <Icon className="h-5 w-5" />
+                  {/* Top card row */}
+                  <div className="flex items-center justify-between">
+                    <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-surface-blue text-primary transition-all duration-200 group-hover:scale-105 group-hover:bg-primary group-hover:text-primary-foreground group-hover:shadow-md group-hover:shadow-primary/20">
+                      <Icon className="h-6 w-6" />
                     </span>
                     {tool.badge && (
-                      <span className="rounded-full bg-primary/10 px-2.5 py-0.5 text-[11px] font-semibold text-primary">
+                      <span
+                        className={`rounded-full border px-2.5 py-0.5 text-[11px] font-semibold ${
+                          tool.badgeColor || "bg-primary/10 text-primary border-primary/20"
+                        }`}
+                      >
                         {tool.badge}
                       </span>
                     )}
                   </div>
 
-                  <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors">
-                    {tool.name}
-                  </h3>
-                  <p className="mt-2 text-xs leading-5 text-muted-foreground sm:text-sm">
-                    {tool.description}
-                  </p>
+                  {/* Tool info */}
+                  <div className="mt-6">
+                    <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                      {tool.tagline}
+                    </p>
+                    <h3 className="mt-1 text-base font-bold text-foreground transition-colors group-hover:text-primary">
+                      {tool.name}
+                    </h3>
+                    <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
+                      {tool.description}
+                    </p>
+                  </div>
                 </div>
 
-                <div className="mt-6 flex items-center gap-1.5 text-xs font-semibold text-primary">
-                  <span>Use tool</span>
-                  <ArrowUpRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                {/* Card footer CTA */}
+                <div className="mt-6 flex items-center justify-between border-t border-border/60 pt-4 text-xs font-semibold text-primary">
+                  <span>Open utility</span>
+                  <ArrowUpRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1 group-hover:-translate-y-1" />
                 </div>
               </Link>
             );

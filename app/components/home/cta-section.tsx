@@ -1,63 +1,108 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import Link from "next/link";
-import { Sparkles, ArrowRight, ShieldCheck, Check } from "lucide-react";
+import { useRouter } from "next/navigation";
+import {
+  Sparkles,
+  ArrowRight,
+  ShieldCheck,
+  Check,
+  Lock,
+} from "lucide-react";
 
 export function CtaSection() {
+  const [email, setEmail] = useState("");
+  const router = useRouter();
+
+  const handleSignup = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (email.trim()) {
+      router.push(`/register?email=${encodeURIComponent(email)}`);
+    } else {
+      router.push("/register");
+    }
+  };
+
   return (
-    <section className="px-4 py-20 sm:px-6 sm:py-24 lg:px-8">
-      <div className="relative mx-auto max-w-5xl overflow-hidden rounded-3xl bg-primary px-6 py-16 text-center text-primary-foreground sm:px-12 sm:py-20 shadow-2xl shadow-primary/20">
-        {/* Ambient background blur elements */}
-        <div className="pointer-events-none absolute -left-20 -top-20 h-64 w-64 rounded-full bg-white/10 blur-2xl" />
-        <div className="pointer-events-none absolute -bottom-20 -right-20 h-64 w-64 rounded-full bg-sky-300/20 blur-2xl" />
+    <section className="relative overflow-hidden py-24 sm:py-32">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="relative overflow-hidden rounded-[36px] bg-gradient-to-b from-slate-900 via-slate-950 to-slate-900 px-6 py-20 text-center text-white shadow-2xl shadow-blue-500/10 sm:px-16 sm:py-28 border border-slate-800">
+          
+          {/* Glowing background mesh & flares */}
+          <div className="pointer-events-none absolute -left-24 -top-24 h-96 w-96 rounded-full bg-blue-600/20 blur-3xl" />
+          <div className="pointer-events-none absolute -right-24 -bottom-24 h-96 w-96 rounded-full bg-sky-500/20 blur-3xl" />
+          <div className="pointer-events-none absolute left-1/2 top-0 h-40 w-80 -translate-x-1/2 bg-gradient-to-b from-blue-500/20 to-transparent blur-2xl" />
 
-        <div className="relative z-10 mx-auto max-w-2xl">
-          {/* Icon Badge */}
-          <div className="mx-auto mb-6 flex h-13 w-13 items-center justify-center rounded-2xl bg-white/15 backdrop-blur-sm">
-            <Sparkles className="h-6 w-6 text-white" />
-          </div>
-
-          <h2 className="text-3xl font-bold tracking-tight text-white sm:text-5xl">
-            Make every day a little easier.
-          </h2>
-
-          <p className="mx-auto mt-4 max-w-xl text-sm leading-relaxed text-blue-100 sm:text-base">
-            Discover free everyday tools, organize your priorities, and get more done
-            faster with iUseDaily.
-          </p>
-
-          {/* Action Buttons */}
-          <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-4">
-            <Link
-              href="/register"
-              className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-full bg-white px-7 text-sm font-semibold text-blue-600 shadow-md transition-all hover:bg-blue-50 active:scale-[0.98] sm:w-auto"
-            >
-              <span>Get started for free</span>
-              <ArrowRight className="h-4 w-4" />
-            </Link>
-
-            <Link
-              href="/tools"
-              className="inline-flex h-12 w-full items-center justify-center rounded-full border border-white/30 bg-white/10 px-6 text-sm font-semibold text-white backdrop-blur-sm transition-all hover:bg-white/20 sm:w-auto"
-            >
-              Explore all tools
-            </Link>
-          </div>
-
-          {/* Trust points */}
-          <div className="mt-10 flex flex-wrap items-center justify-center gap-6 text-xs text-blue-100">
-            <div className="flex items-center gap-1.5">
-              <Check className="h-4 w-4 text-white" />
-              <span>Free forever tools</span>
+          <div className="relative z-10 mx-auto max-w-3xl">
+            {/* Top Pill */}
+            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-blue-500/30 bg-blue-500/10 px-4 py-1.5 text-xs font-semibold text-blue-300 backdrop-blur-md">
+              <Sparkles className="h-3.5 w-3.5 text-blue-400" />
+              <span>Free forever tools • No credit card required</span>
             </div>
-            <div className="flex items-center gap-1.5">
-              <Check className="h-4 w-4 text-white" />
-              <span>No credit card required</span>
+
+            {/* Headline */}
+            <h2 className="text-3xl font-black tracking-tight text-white sm:text-5xl lg:text-6xl">
+              Ready to reclaim your
+              <br />
+              <span className="bg-gradient-to-r from-blue-400 via-sky-300 to-indigo-300 bg-clip-text text-transparent">
+                digital focus?
+              </span>
+            </h2>
+
+            <p className="mx-auto mt-6 max-w-xl text-base leading-relaxed text-slate-300 sm:text-lg">
+              Join over 50,000+ creators, students, and professionals who save hours every week
+              with iUseDaily’s all-in-one productivity suite.
+            </p>
+
+            {/* Quick Email Capture / CTA Bar */}
+            <form
+              onSubmit={handleSignup}
+              className="mx-auto mt-10 flex max-w-md flex-col gap-2.5 sm:flex-row sm:items-center"
+            >
+              <div className="flex h-13 flex-1 items-center rounded-2xl border border-slate-700 bg-slate-800/80 px-4 text-sm shadow-inner backdrop-blur-md focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-500/20">
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Enter your email address"
+                  className="w-full bg-transparent text-sm text-white placeholder:text-slate-400 outline-none"
+                />
+              </div>
+
+              <button
+                type="submit"
+                className="inline-flex h-13 items-center justify-center gap-2 rounded-2xl bg-primary px-7 text-sm font-semibold text-white shadow-lg shadow-primary/30 transition-all hover:opacity-95 hover:shadow-xl active:scale-[0.98]"
+              >
+                <span>Get started free</span>
+                <ArrowRight className="h-4 w-4" />
+              </button>
+            </form>
+
+            {/* Secondary Action */}
+            <div className="mt-4">
+              <Link
+                href="/tools"
+                className="text-xs font-semibold text-slate-400 transition-colors hover:text-white underline underline-offset-4"
+              >
+                Or explore 50+ tools without an account &rarr;
+              </Link>
             </div>
-            <div className="flex items-center gap-1.5">
-              <ShieldCheck className="h-4 w-4 text-white" />
-              <span>Private & secure</span>
+
+            {/* Trust and Social Proof Badges */}
+            <div className="mt-12 flex flex-wrap items-center justify-center gap-6 border-t border-slate-800/80 pt-8 text-xs text-slate-400">
+              <div className="flex items-center gap-1.5">
+                <Check className="h-4 w-4 text-emerald-400" />
+                <span>Instant access in seconds</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <Lock className="h-4 w-4 text-blue-400" />
+                <span>Bank-grade local privacy</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <ShieldCheck className="h-4 w-4 text-purple-400" />
+                <span>Zero telemetry or tracking</span>
+              </div>
             </div>
           </div>
         </div>
