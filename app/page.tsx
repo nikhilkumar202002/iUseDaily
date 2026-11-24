@@ -19,7 +19,6 @@ import {
   Globe2,
 } from "lucide-react";
 import { useState } from "react";
-import Header from "./components/layout/header";
 
 const popularTools = [
   {
@@ -338,67 +337,14 @@ function CTASection() {
   );
 }
 
-function Footer() {
-  return (
-    <footer className="border-t border-border px-5 py-12 sm:px-8">
-      <div className="mx-auto flex max-w-7xl flex-col justify-between gap-10 md:flex-row">
-        <div className="max-w-sm">
-          <Link href="/" className="text-xl font-bold tracking-tight">
-            iUse<span className="text-primary">Daily</span>
-          </Link>
-          <p className="mt-4 text-sm leading-7 text-muted-foreground">
-            Your everyday digital companion. Useful tools, smarter
-            organization and AI assistance — all in one place.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-2 gap-10 sm:grid-cols-3">
-          <div>
-            <h4 className="mb-4 text-sm font-semibold">Explore</h4>
-            <div className="flex flex-col gap-3 text-sm text-muted-foreground">
-              <Link href="/tools">All tools</Link>
-              <Link href="/organizer">Organizer</Link>
-              <Link href="/ai-assistant">AI assistant</Link>
-            </div>
-          </div>
-          <div>
-            <h4 className="mb-4 text-sm font-semibold">Company</h4>
-            <div className="flex flex-col gap-3 text-sm text-muted-foreground">
-              <Link href="/about">About us</Link>
-              <Link href="/contact">Contact</Link>
-              <Link href="/blog">Blog</Link>
-            </div>
-          </div>
-          <div>
-            <h4 className="mb-4 text-sm font-semibold">Legal</h4>
-            <div className="flex flex-col gap-3 text-sm text-muted-foreground">
-              <Link href="/privacy">Privacy policy</Link>
-              <Link href="/terms">Terms of use</Link>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="mx-auto mt-12 flex max-w-7xl flex-col justify-between gap-3 border-t border-border pt-6 text-xs text-muted-foreground sm:flex-row">
-        <p>© 2026 iUseDaily. All rights reserved.</p>
-        <p>Made for everyday life.</p>
-      </div>
-    </footer>
-  );
-}
-
 export default function Home() {
   return (
-    <>
-      <Header />
-      <main>
-        <HeroSection />
-        <ToolsSection />
-        <ModulesSection />
-        <BenefitsSection />
-        <CTASection />
-      </main>
-      <Footer />
-    </>
+    <main>
+      <HeroSection />
+      <ToolsSection />
+      <ModulesSection />
+      <BenefitsSection />
+      <CTASection />
+    </main>
   );
 }
