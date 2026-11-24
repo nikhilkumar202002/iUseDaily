@@ -12,8 +12,6 @@ import {
   Scissors,
   Layers,
   Code2,
-  UploadCloud,
-  Zap,
 } from "lucide-react";
 
 type Category = "ALL" | "PDF" | "IMAGE" | "TEXT" | "CALCULATOR";
@@ -137,63 +135,21 @@ export function ToolsSection() {
       <div className="pointer-events-none absolute left-1/2 top-1/2 -z-10 h-[500px] w-[800px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary/5 blur-3xl" />
 
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        {/* Section Header */}
-        <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
-          <div className="max-w-2xl">
-            <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-3.5 py-1 text-xs font-semibold text-primary">
-              <Zap className="h-3.5 w-3.5" />
-              <span>Core Utilities Engine</span>
-            </div>
-            <h2 className="text-3xl font-extrabold tracking-tight text-foreground sm:text-4xl lg:text-5xl">
-              High-speed utility tools.
-              <br />
-              <span className="text-muted-foreground font-semibold">Zero installation. Zero waiting.</span>
-            </h2>
-            <p className="mt-4 text-base leading-relaxed text-muted-foreground">
-              Built on WebAssembly and client-side processing. Your files never touch external servers,
-              providing instantaneous speeds and enterprise-grade confidentiality.
-            </p>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <Link
-              href="/tools"
-              className="group inline-flex items-center gap-2 rounded-full border border-border bg-card px-5 py-2.5 text-sm font-semibold text-foreground shadow-sm transition-all hover:border-primary/50 hover:bg-muted"
-            >
-              <span>Explore all 50+ tools</span>
-              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-            </Link>
-          </div>
+        {/* Section Header (Centered, Eyebrow Removed) */}
+        <div className="mx-auto max-w-3xl text-center">
+          <h2 className="text-3xl font-extrabold tracking-tight text-foreground sm:text-4xl lg:text-5xl">
+            High-speed utility tools.
+            <br />
+            <span className="text-muted-foreground font-semibold">Zero installation. Zero waiting.</span>
+          </h2>
+          <p className="mt-4 text-base leading-relaxed text-muted-foreground">
+            Built on WebAssembly and client-side processing. Your files never touch external servers,
+            providing instantaneous speeds and enterprise-grade confidentiality.
+          </p>
         </div>
 
-        {/* Interactive Dropzone Teaser Bar */}
-        <div className="mt-10 rounded-2xl border border-dashed border-primary/30 bg-primary/5 p-6 backdrop-blur-sm sm:p-8">
-          <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
-            <div className="flex items-center gap-4">
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-md shadow-primary/25">
-                <UploadCloud className="h-6 w-6" />
-              </div>
-              <div>
-                <h4 className="text-sm font-bold text-foreground">Instant Quick-Convert Dropzone</h4>
-                <p className="text-xs text-muted-foreground">
-                  Drag and drop any PDF, Word document, PNG or JSON file here to launch the correct tool instantly.
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-2">
-              <Link
-                href="/tools"
-                className="inline-flex items-center justify-center rounded-xl bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground shadow-sm hover:opacity-95"
-              >
-                Select File
-              </Link>
-            </div>
-          </div>
-        </div>
-
-        {/* Category Tabs */}
-        <div className="mt-10 flex flex-wrap gap-2 border-b border-border pb-4">
+        {/* Category Tabs (Centered) */}
+        <div className="mt-10 flex flex-wrap justify-center gap-2 border-b border-border pb-5">
           {categoryTabs.map((tab) => {
             const isSelected = activeCategory === tab.value;
             return (
@@ -269,6 +225,17 @@ export function ToolsSection() {
               </Link>
             );
           })}
+        </div>
+
+        {/* Button below the cards (Centered) */}
+        <div className="mt-12 flex justify-center">
+          <Link
+            href="/tools"
+            className="group inline-flex items-center gap-2 rounded-full border border-border bg-card px-7 py-3 text-sm font-semibold text-foreground shadow-sm transition-all hover:border-primary/50 hover:bg-muted"
+          >
+            <span>Explore all 50+ tools</span>
+            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+          </Link>
         </div>
       </div>
     </section>
