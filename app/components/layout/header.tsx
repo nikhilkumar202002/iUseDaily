@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTheme } from "next-themes";
@@ -26,6 +26,19 @@ const defaultNavLinks: NavLinkItem[] = [
   { label: "Pricing", href: "/pricing" },
 ];
 
+function subscribeScroll(callback: () => void) {
+  window.addEventListener("scroll", callback, { passive: true });
+  return () => window.removeEventListener("scroll", callback);
+}
+
+function getScrollSnapshot() {
+  return window.scrollY > 15;
+}
+
+function getScrollServerSnapshot() {
+  return false;
+}
+
 export function ThemeToggle({ className = "" }: { className?: string }) {
   const { setTheme, resolvedTheme } = useTheme();
 
@@ -49,6 +62,11 @@ export function Header({
 }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const pathname = usePathname();
+  const isScrolled = useSyncExternalStore(
+    subscribeScroll,
+    getScrollSnapshot,
+    getScrollServerSnapshot
+  );
 
   // Adjust state when pathname changes during render without an effect (React 19 pattern)
   const [prevPathname, setPrevPathname] = useState(pathname);
@@ -57,8 +75,21 @@ export function Header({
     setMobileMenuOpen(false);
   }
 
+  const handleLogoClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    if (pathname === "/") {
+      e.preventDefault();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  };
+
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border bg-background/80 backdrop-blur-xl transition-colors duration-200">
+    <header
+      className={`sticky top-0 z-50 w-full transition-all duration-300 ease-out animate-in fade-in slide-in-from-top-4 duration-700 ${
+        isScrolled
+          ? "border-b border-border bg-background/85 backdrop-blur-xl shadow-sm shadow-black/5"
+          : "border-b border-transparent bg-background/60 backdrop-blur-md"
+      }`}
+    >
       <div className="mx-auto flex h-18 max-w-7xl items-center px-4 sm:px-6 lg:px-8">
         {/* 3-Column Grid Layout */}
         <div className="grid w-full grid-cols-2 items-center md:grid-cols-3">
@@ -67,8 +98,9 @@ export function Header({
           <div className="flex items-center justify-start">
             <Link
               href="/"
+              onClick={handleLogoClick}
               className="group flex items-center gap-2.5 rounded-lg p-0.5 transition-opacity hover:opacity-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-              aria-label="iUseDaily Home"
+              aria-label="iUseDaily Home - Scroll to top"
             >
               <div className="relative flex h-9 w-9 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-md shadow-primary/20 transition-transform duration-200 group-hover:scale-105">
                 <span className="text-lg font-black tracking-tighter">i</span>
@@ -154,7 +186,7 @@ export function Header({
 
       {/* Mobile Dropdown Menu */}
       {mobileMenuOpen && (
-        <div className="border-t border-border bg-background/95 px-4 py-5 backdrop-blur-xl md:hidden">
+        <div className="border-t border-border bg-background/95 px-4 py-5 backdrop-blur-xl md:hidden animate-in fade-in slide-in-from-top-2 duration-200">
           <nav className="flex flex-col gap-1.5">
             {navLinks.map((link) => {
               const isActive = pathname === link.href;
