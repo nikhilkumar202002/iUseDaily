@@ -11,6 +11,7 @@ import {
   X,
   Sparkles,
   ArrowRight,
+  Search,
 } from "lucide-react";
 
 export interface NavLinkItem {
@@ -146,8 +147,17 @@ export function Header({
             })}
           </nav>
 
-          {/* COLUMN 3: Dark/Light Mode, Sign in, Get started */}
+          {/* COLUMN 3: Search, Dark/Light Mode, Sign in, Get started */}
           <div className="flex items-center justify-end gap-2 sm:gap-3">
+            {/* Quick Search Action */}
+            <Link
+              href="/tools"
+              aria-label="Search tools"
+              className="flex h-9 w-9 items-center justify-center rounded-full border border-border bg-card text-muted-foreground transition-all duration-200 hover:border-primary/50 hover:bg-muted hover:text-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+            >
+              <Search className="h-4 w-4" />
+            </Link>
+
             {/* Dark / Light Mode Toggle */}
             <ThemeToggle />
 
