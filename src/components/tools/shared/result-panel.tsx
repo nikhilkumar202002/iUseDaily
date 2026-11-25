@@ -12,7 +12,7 @@ import {
   Layers,
 } from "lucide-react";
 import type { ProcessingResult } from "./types";
-import { triggerDownload } from "../processors/other/other-utils";
+import { triggerDownload, formatBytes } from "../processors/other/other-utils";
 
 export interface ResultPanelProps {
   result: ProcessingResult;
@@ -137,6 +137,27 @@ export function ResultPanel({
                     </>
                   )}
                 </div>
+
+                {/* Size reduction / comparison badge if present */}
+                {result.originalSize !== undefined && result.reductionPercentage !== undefined && (
+                  <div className="mt-2.5 flex flex-wrap items-center gap-2 border-t border-border pt-2 text-xs">
+                    <span className="text-muted-foreground">
+                      Original: <span className="line-through">{formatBytes(result.originalSize)}</span>
+                    </span>
+                    <span className="font-semibold text-foreground">
+                      New: {result.formattedSize}
+                    </span>
+                    {result.isSmaller ? (
+                      <span className="rounded-full bg-emerald-500/15 px-2 py-0.5 text-[11px] font-bold text-emerald-600 dark:text-emerald-400">
+                        -{result.reductionPercentage}% ({formatBytes(result.savedBytes || 0)} saved)
+                      </span>
+                    ) : (
+                      <span className="rounded-full bg-amber-500/15 px-2 py-0.5 text-[11px] font-medium text-amber-600 dark:text-amber-400">
+                        Already optimized ({result.reductionPercentage < 0 ? `+${Math.abs(result.reductionPercentage)}%` : "0% difference"})
+                      </span>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
           </div>

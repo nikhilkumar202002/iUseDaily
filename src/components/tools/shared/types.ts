@@ -38,6 +38,10 @@ export interface ProcessingResult {
   fileName: string;
   fileSize: number;
   formattedSize: string;
+  originalSize?: number;
+  savedBytes?: number;
+  reductionPercentage?: number;
+  isSmaller?: boolean;
   downloadUrl?: string;
   textOutput?: string;
   previewUrl?: string;
