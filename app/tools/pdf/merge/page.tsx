@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   FileText,
   Files,
@@ -8,6 +8,7 @@ import {
   Sparkles,
   Sliders,
   CheckCircle2,
+  AlertTriangle,
 } from "lucide-react";
 import {
   ToolPageLayout,
@@ -27,7 +28,7 @@ import {
 } from "@/src/components/tools/shared";
 import {
   mergePdfFiles,
-  getPdfPageCount,
+  validateAndInspectPdf,
 } from "@/src/components/tools/processors/pdf/merge-pdf";
 import { formatBytes } from "@/src/components/tools/processors/other/other-utils";
 
@@ -40,7 +41,7 @@ const mergePdfMetadata: ToolMetadata = {
   categoryHref: "/tools?category=PDF",
   icon: Files,
   badge: "Popular",
-  accept: ".pdf",
+  accept: ".pdf,application/pdf",
   maxFiles: 20,
   maxFileSizeMB: 50,
   instructions: [
@@ -116,12 +117,25 @@ export default function MergePdfPage() {
   const [statusMessage, setStatusMessage] = useState<string>("");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [result, setResult] = useState<ProcessingResult | null>(null);
-  const [outputName, setOutputName] = useState("merged_document.pdf");
+  const [outputName, setOutputName] = useState("merged-document.pdf");
   const [includeOutline, setIncludeOutline] = useState(true);
   const [previewFile, setPreviewFile] = useState<ToolFile | null>(null);
   const [isReadingFiles, setIsReadingFiles] = useState(false);
 
-  // File upload handler - converts File[] to ToolFile[] and extracts real page counts with pdf-lib
+  // Object URL lifecycle ref for clean revocation
+  const downloadUrlRef = useRef<string | null>(null);
+
+  // Revoke object URLs on component unmount
+  useEffect(() => {
+    return () => {
+      if (downloadUrlRef.current) {
+        URL.revokeObjectURL(downloadUrlRef.current);
+        downloadUrlRef.current = null;
+      }
+    };
+  }, []);
+
+  // File upload handler - validates files, checks encryption & extracts real page counts
   const handleFilesSelected = async (newFiles: File[]) => {
     setIsReadingFiles(true);
     setErrorMessage(null);
@@ -139,23 +153,23 @@ export default function MergePdfPage() {
 
     setFiles((prev) => [...prev, ...initialFormatted]);
     setStatus("idle");
-    setResult(null);
 
-    // Asynchronously resolve page counts using real pdf-lib
-    const updatedFiles = await Promise.all(
+    // Asynchronously validate each PDF using pdf-lib
+    const validatedFiles = await Promise.all(
       initialFormatted.map(async (toolFile) => {
-        try {
-          const pageCount = await getPdfPageCount(toolFile.file);
+        const validation = await validateAndInspectPdf(toolFile.file);
+        if (validation.isValid) {
           return {
             ...toolFile,
-            pageCount,
+            pageCount: validation.pageCount,
             status: "ready" as const,
           };
-        } catch {
+        } else {
           return {
             ...toolFile,
-            pageCount: 1,
-            status: "ready" as const,
+            pageCount: 0,
+            status: "error" as const,
+            error: validation.error || "Invalid PDF file",
           };
         }
       })
@@ -163,7 +177,7 @@ export default function MergePdfPage() {
 
     setFiles((prev) =>
       prev.map((f) => {
-        const found = updatedFiles.find((u) => u.id === f.id);
+        const found = validatedFiles.find((v) => v.id === f.id);
         return found || f;
       })
     );
@@ -194,33 +208,46 @@ export default function MergePdfPage() {
     setFiles((prev) => prev.filter((f) => f.id !== id));
   };
 
-  // Clear all files
+  // Clear all files and revoke previous result URL
   const handleClearAll = () => {
+    if (downloadUrlRef.current) {
+      URL.revokeObjectURL(downloadUrlRef.current);
+      downloadUrlRef.current = null;
+    }
     setFiles([]);
     setStatus("idle");
     setProgress(undefined);
+    setStatusMessage("");
     setResult(null);
     setErrorMessage(null);
   };
 
-  // Calculations
-  const totalSizeBytes = files.reduce((acc, f) => acc + f.size, 0);
+  // Calculations for valid files only
+  const validFiles = files.filter((f) => f.status === "ready");
+  const hasErrorFiles = files.some((f) => f.status === "error");
+  const totalSizeBytes = validFiles.reduce((acc, f) => acc + f.size, 0);
   const totalFormattedSize = formatBytes(totalSizeBytes);
-  const totalPages = files.reduce((acc, f) => acc + (f.pageCount || 0), 0);
+  const totalPages = validFiles.reduce((acc, f) => acc + (f.pageCount || 0), 0);
 
-  // Real PDF merge execution using pdf-lib processor
+  // Real PDF merge execution in the browser via pdf-lib
   const handleMerge = async () => {
-    if (files.length < 2) return;
+    if (validFiles.length < 2 || hasErrorFiles) return;
+
+    // Revoke previous URL if exists
+    if (downloadUrlRef.current) {
+      URL.revokeObjectURL(downloadUrlRef.current);
+      downloadUrlRef.current = null;
+    }
 
     setStatus("processing");
     setProgress(5);
-    setStatusMessage("Preparing PDF files...");
+    setStatusMessage("Initializing merged document container...");
     setErrorMessage(null);
 
     try {
-      const nativeFiles = files.map((f) => f.file);
+      const nativeFiles = validFiles.map((f) => f.file);
       const mergeResult = await mergePdfFiles(nativeFiles, {
-        outputFilename: outputName,
+        outputFilename: outputName || "merged-document.pdf",
         includeBookmarks: includeOutline,
         onProgress: (percent, stepMessage) => {
           setProgress(percent);
@@ -228,6 +255,7 @@ export default function MergePdfPage() {
         },
       });
 
+      downloadUrlRef.current = mergeResult.downloadUrl || null;
       setResult(mergeResult);
       setStatus("success");
       setProgress(100);
@@ -235,11 +263,16 @@ export default function MergePdfPage() {
       const msg = err instanceof Error ? err.message : "Failed to merge PDF files.";
       setErrorMessage(msg);
       setStatus("error");
+      setProgress(undefined);
     }
   };
 
-  // Reset to initial state
+  // Reset to initial state and revoke object URL
   const handleReset = () => {
+    if (downloadUrlRef.current) {
+      URL.revokeObjectURL(downloadUrlRef.current);
+      downloadUrlRef.current = null;
+    }
     setFiles([]);
     setStatus("idle");
     setProgress(undefined);
@@ -249,7 +282,7 @@ export default function MergePdfPage() {
   };
 
   const isProcessing = status === "processing";
-  const canMerge = files.length >= 2 && !isProcessing && !isReadingFiles;
+  const canMerge = validFiles.length >= 2 && !hasErrorFiles && !isProcessing && !isReadingFiles;
 
   // Workspace Main Content (Left Card)
   const workspaceContent = (
@@ -259,7 +292,7 @@ export default function MergePdfPage() {
           result={result}
           onReset={handleReset}
           title="PDFs merged successfully!"
-          subtitle={`Your ${result.itemCount || files.length} PDF files have been combined into a unified document.`}
+          subtitle={`Your ${result.itemCount || validFiles.length} PDF files (${result.pageCount || totalPages} pages) have been combined into a unified document.`}
           downloadLabel="Download Merged PDF"
           resetLabel="Merge another PDF"
         />
@@ -276,7 +309,7 @@ export default function MergePdfPage() {
             isReading={isReadingFiles}
             title="Drag and drop your files here"
             supportingText="or browse files from your device"
-            acceptedTypesLabel="PDF files up to 50 MB"
+            acceptedTypesLabel="PDF files up to 50 MB each"
             className="flex-1"
           />
 
@@ -289,15 +322,25 @@ export default function MergePdfPage() {
               onClearAll={handleClearAll}
               onPreviewFile={(file) => setPreviewFile(file)}
               disabled={isProcessing}
-              title={`${files.length} ${files.length === 1 ? "PDF file" : "PDF files"} ready`}
+              title={`${files.length} ${files.length === 1 ? "PDF file" : "PDF files"} uploaded`}
             />
           )}
 
-          {/* Notice when only 1 file is uploaded */}
-          {files.length === 1 && (
+          {/* Warning when invalid/error files are detected */}
+          {hasErrorFiles && (
+            <div className="flex items-center gap-2.5 rounded-xl border border-destructive/20 bg-destructive/10 px-4 py-3 text-xs font-medium text-destructive">
+              <AlertTriangle className="h-4 w-4 shrink-0" />
+              <span>
+                One or more files have issues (corrupted or password-protected). Please remove them before merging.
+              </span>
+            </div>
+          )}
+
+          {/* Informational notice when only 1 valid file is uploaded */}
+          {!hasErrorFiles && files.length === 1 && (
             <div className="flex items-center gap-2 rounded-xl bg-amber-500/10 px-4 py-3 text-xs font-medium text-amber-600 dark:text-amber-400">
               <FileText className="h-4 w-4 shrink-0" />
-              <span>Please upload at least one more PDF file to combine them.</span>
+              <span>Please upload at least one more PDF file to combine them together.</span>
             </div>
           )}
 
@@ -310,7 +353,7 @@ export default function MergePdfPage() {
             />
           )}
 
-          {/* Real In-Progress Status Bar */}
+          {/* In-Progress Status Bar */}
           {isProcessing && (
             <div className="space-y-2.5 rounded-2xl border border-border bg-card p-5">
               <div className="flex items-center justify-between text-xs font-semibold">
@@ -345,7 +388,7 @@ export default function MergePdfPage() {
   // Configuration Sidebar (Right Card)
   const sidebarContent = (
     <ToolSidebar title="Merge Options">
-      {/* Output Filename Field */}
+      {/* Output Filename Field (defaults to merged-document.pdf) */}
       <div className="space-y-1.5">
         <label className="text-xs font-semibold text-foreground">
           Output Filename
@@ -356,7 +399,7 @@ export default function MergePdfPage() {
             value={outputName}
             onChange={(e) => setOutputName(e.target.value)}
             disabled={isProcessing}
-            placeholder="merged_document.pdf"
+            placeholder="merged-document.pdf"
             className="h-10 w-full rounded-xl border border-border bg-background px-3 text-xs text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary disabled:opacity-50"
           />
         </div>
@@ -381,8 +424,10 @@ export default function MergePdfPage() {
       {/* Summary Box with real calculated stats */}
       <div className="space-y-2 rounded-xl bg-muted/50 p-3.5 text-xs">
         <div className="flex items-center justify-between text-muted-foreground">
-          <span>Files selected</span>
-          <span className="font-semibold text-foreground">{files.length}</span>
+          <span>Valid files</span>
+          <span className="font-semibold text-foreground">
+            {validFiles.length} of {files.length}
+          </span>
         </div>
         {totalPages > 0 && (
           <div className="flex items-center justify-between text-muted-foreground">
@@ -391,9 +436,9 @@ export default function MergePdfPage() {
           </div>
         )}
         <div className="flex items-center justify-between text-muted-foreground">
-          <span>Total file size</span>
+          <span>Total size</span>
           <span className="font-semibold text-foreground">
-            {files.length > 0 ? totalFormattedSize : "0 B"}
+            {validFiles.length > 0 ? totalFormattedSize : "0 B"}
           </span>
         </div>
         <div className="flex items-center justify-between text-muted-foreground">
@@ -405,7 +450,7 @@ export default function MergePdfPage() {
       {/* Merge Action Button with real loading & progress */}
       {status !== "success" && (
         <ProcessingButton
-          label={`Merge ${files.length > 0 ? `${files.length} PDF Files` : "PDFs"}`}
+          label={`Merge ${validFiles.length > 0 ? `${validFiles.length} PDF Files` : "PDFs"}`}
           loadingLabel="Merging PDFs..."
           isProcessing={isProcessing}
           progress={progress}
@@ -417,7 +462,7 @@ export default function MergePdfPage() {
       {/* Subtle hint */}
       <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
         <Sliders className="h-3.5 w-3.5 text-primary" />
-        <span>Reorder files anytime using drag handles</span>
+        <span>Reorder files anytime before merging</span>
       </div>
     </ToolSidebar>
   );

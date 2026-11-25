@@ -2,18 +2,93 @@ import { PDFDocument } from "pdf-lib";
 import type { ProcessingResult, PdfProcessingOptions } from "../../shared/types";
 import { formatBytes } from "../other/other-utils";
 
+export interface PdfValidationResult {
+  isValid: boolean;
+  pageCount: number;
+  error?: string;
+}
+
+/**
+ * Validate PDF file integrity, format, and password encryption status in the browser
+ */
+export async function validateAndInspectPdf(file: File): Promise<PdfValidationResult> {
+  try {
+    // 1. Basic extension / MIME check
+    const isPdfExt = file.name.toLowerCase().endsWith(".pdf");
+    const isPdfMime = !file.type || file.type === "application/pdf" || file.type === "application/x-pdf";
+    if (!isPdfExt && !isPdfMime) {
+      return {
+        isValid: false,
+        pageCount: 0,
+        error: "Not a valid PDF file format (.pdf required).",
+      };
+    }
+
+    // 2. Read array buffer and check PDF magic bytes (%PDF-)
+    const arrayBuffer = await file.arrayBuffer();
+    if (arrayBuffer.byteLength < 5) {
+      return {
+        isValid: false,
+        pageCount: 0,
+        error: "File is empty or truncated.",
+      };
+    }
+
+    const headerBytes = new Uint8Array(arrayBuffer.slice(0, 5));
+    const headerStr = String.fromCharCode(...headerBytes);
+    if (!headerStr.startsWith("%PDF")) {
+      return {
+        isValid: false,
+        pageCount: 0,
+        error: "Corrupted or invalid PDF header.",
+      };
+    }
+
+    // 3. Load with pdf-lib to check structure and encryption
+    const pdfDoc = await PDFDocument.load(arrayBuffer, { ignoreEncryption: false });
+    const pageCount = pdfDoc.getPageCount();
+
+    if (pageCount === 0) {
+      return {
+        isValid: false,
+        pageCount: 0,
+        error: "PDF contains no readable pages.",
+      };
+    }
+
+    return {
+      isValid: true,
+      pageCount,
+    };
+  } catch (err: unknown) {
+    const errorStr = (err instanceof Error ? err.message : String(err)).toLowerCase();
+    
+    if (
+      errorStr.includes("encrypt") ||
+      errorStr.includes("password") ||
+      errorStr.includes("security")
+    ) {
+      return {
+        isValid: false,
+        pageCount: 0,
+        error: "Password-protected or encrypted PDF.",
+      };
+    }
+
+    return {
+      isValid: false,
+      pageCount: 0,
+      error: "Corrupted or unreadable PDF document.",
+    };
+  }
+}
+
 /**
  * Extract total page count of a PDF file using pdf-lib
  */
 export async function getPdfPageCount(file: File): Promise<number> {
-  try {
-    const arrayBuffer = await file.arrayBuffer();
-    const pdfDoc = await PDFDocument.load(arrayBuffer, { ignoreEncryption: true });
-    return pdfDoc.getPageCount();
-  } catch (error) {
-    console.error(`Failed to read page count for ${file.name}:`, error);
-    return 1;
-  }
+  const result = await validateAndInspectPdf(file);
+  return result.isValid ? result.pageCount : 1;
 }
 
 /**
@@ -29,9 +104,9 @@ export async function mergePdfFiles(
     throw new Error("At least two PDF files are required to merge.");
   }
 
-  const { onProgress, outputFilename = "merged_document.pdf" } = options;
+  const { onProgress, outputFilename = "merged-document.pdf" } = options;
 
-  onProgress?.(10, "Initializing merged document...");
+  onProgress?.(5, "Initializing merged document container...");
   const mergedPdf = await PDFDocument.create();
 
   const total = files.length;
@@ -39,29 +114,42 @@ export async function mergePdfFiles(
 
   for (let i = 0; i < total; i++) {
     const file = files[i];
-    const percent = Math.round(15 + ((i + 1) / total) * 70);
+    const percent = Math.round(10 + ((i + 1) / total) * 75);
     onProgress?.(percent, `Processing file ${i + 1} of ${total}: ${file.name}`);
 
-    const arrayBuffer = await file.arrayBuffer();
-    const srcDoc = await PDFDocument.load(arrayBuffer, { ignoreEncryption: true });
-    const copiedPages = await mergedPdf.copyPages(srcDoc, srcDoc.getPageIndices());
-    
-    for (const page of copiedPages) {
-      mergedPdf.addPage(page);
-      totalPageCount++;
+    try {
+      const arrayBuffer = await file.arrayBuffer();
+      // Ensure we catch password-protected/corrupted files safely
+      const srcDoc = await PDFDocument.load(arrayBuffer, { ignoreEncryption: false });
+      const copiedPages = await mergedPdf.copyPages(srcDoc, srcDoc.getPageIndices());
+
+      for (const page of copiedPages) {
+        mergedPdf.addPage(page);
+        totalPageCount++;
+      }
+    } catch (err: unknown) {
+      const errStr = (err instanceof Error ? err.message : String(err)).toLowerCase();
+      if (errStr.includes("encrypt") || errStr.includes("password")) {
+        throw new Error(
+          `"${file.name}" is password-protected or encrypted. Please remove or decrypt it to merge.`
+        );
+      }
+      throw new Error(
+        `"${file.name}" is corrupted or unreadable. Please check or remove this file.`
+      );
     }
   }
 
-  onProgress?.(90, "Finalizing and encoding merged PDF...");
+  onProgress?.(90, "Finalizing and encoding merged PDF document...");
   const mergedPdfBytes = await mergedPdf.save();
   const blob = new Blob([mergedPdfBytes as Uint8Array<ArrayBuffer>], { type: "application/pdf" });
   const downloadUrl = URL.createObjectURL(blob);
 
   onProgress?.(100, "Done!");
 
-  const finalName = outputFilename.toLowerCase().endsWith(".pdf")
-    ? outputFilename
-    : `${outputFilename}.pdf`;
+  const finalName = outputFilename.trim().toLowerCase().endsWith(".pdf")
+    ? outputFilename.trim()
+    : `${outputFilename.trim()}.pdf`;
 
   return {
     fileName: finalName,
