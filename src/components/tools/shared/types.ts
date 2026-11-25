@@ -26,6 +26,14 @@ export interface ProcessingState {
   error?: string;
 }
 
+export interface SplitOutputFile {
+  name: string;
+  size: number;
+  formattedSize: string;
+  pageCount: number;
+  downloadUrl: string;
+}
+
 export interface ProcessingResult {
   fileName: string;
   fileSize: number;
@@ -35,6 +43,9 @@ export interface ProcessingResult {
   previewUrl?: string;
   itemCount?: number;
   pageCount?: number;
+  zipUrl?: string;
+  zipFileName?: string;
+  outputFiles?: SplitOutputFile[];
   meta?: Record<string, string | number | boolean>;
 }
 

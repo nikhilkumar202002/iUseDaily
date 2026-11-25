@@ -63,60 +63,106 @@ export function ResultPanel({
       </p>
 
       {/* Output Details Box */}
-      <div className="mx-auto mt-6 w-full max-w-md rounded-2xl border border-border bg-card p-4 text-left shadow-sm">
-        <div className="flex items-center justify-between gap-3">
-          <div className="flex items-center gap-3 min-w-0">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-surface-blue text-primary">
-              <FileText className="h-5 w-5" />
-            </div>
+      {result.outputFiles && result.outputFiles.length > 1 ? (
+        <div className="mx-auto mt-6 w-full max-w-lg space-y-3 text-left">
+          <div className="flex items-center justify-between px-1 text-xs">
+            <span className="font-semibold text-foreground">
+              Generated Files ({result.outputFiles.length})
+            </span>
+            <span className="text-muted-foreground">{result.formattedSize}</span>
+          </div>
 
-            <div className="min-w-0">
-              <p className="truncate text-sm font-semibold text-foreground">
-                {result.fileName}
-              </p>
-              <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                <span>{result.formattedSize}</span>
-                {result.pageCount !== undefined && (
-                  <>
-                    <span>•</span>
-                    <span className="inline-flex items-center gap-1 font-medium text-foreground">
-                      <Layers className="h-3 w-3 text-primary" />
-                      {result.pageCount} pages
-                    </span>
-                  </>
-                )}
-                {result.itemCount !== undefined && (
-                  <>
-                    <span>•</span>
-                    <span>{result.itemCount} files combined</span>
-                  </>
-                )}
+          <div className="max-h-56 space-y-2 overflow-y-auto rounded-2xl border border-border bg-card p-3 shadow-sm">
+            {result.outputFiles.map((file, idx) => (
+              <div
+                key={idx}
+                className="flex items-center justify-between gap-3 rounded-xl border border-border/60 bg-muted/30 p-2.5 transition-colors hover:bg-muted/60"
+              >
+                <div className="flex min-w-0 items-center gap-2.5">
+                  <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-md bg-muted text-[10px] font-mono font-semibold text-muted-foreground">
+                    {idx + 1}
+                  </span>
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-surface-blue text-primary">
+                    <FileText className="h-4 w-4" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="truncate text-xs font-semibold text-foreground">
+                      {file.name}
+                    </p>
+                    <p className="text-[10px] text-muted-foreground">
+                      {file.formattedSize} • {file.pageCount} {file.pageCount === 1 ? "page" : "pages"}
+                    </p>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => triggerDownload(file.downloadUrl, file.name)}
+                  aria-label={`Download ${file.name}`}
+                  className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-background text-foreground shadow-xs transition-colors hover:bg-primary hover:text-primary-foreground"
+                >
+                  <Download className="h-3.5 w-3.5" />
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : (
+        <div className="mx-auto mt-6 w-full max-w-md rounded-2xl border border-border bg-card p-4 text-left shadow-sm">
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-surface-blue text-primary">
+                <FileText className="h-5 w-5" />
+              </div>
+
+              <div className="min-w-0">
+                <p className="truncate text-sm font-semibold text-foreground">
+                  {result.fileName}
+                </p>
+                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                  <span>{result.formattedSize}</span>
+                  {result.pageCount !== undefined && (
+                    <>
+                      <span>•</span>
+                      <span className="inline-flex items-center gap-1 font-medium text-foreground">
+                        <Layers className="h-3 w-3 text-primary" />
+                        {result.pageCount} pages
+                      </span>
+                    </>
+                  )}
+                  {result.itemCount !== undefined && (
+                    <>
+                      <span>•</span>
+                      <span>{result.itemCount} files</span>
+                    </>
+                  )}
+                </div>
               </div>
             </div>
           </div>
+
+          {/* Text output preview if present */}
+          {result.textOutput && (
+            <div className="mt-3 max-h-36 overflow-auto rounded-xl bg-muted/50 p-3 font-mono text-xs text-foreground">
+              {result.textOutput}
+            </div>
+          )}
+
+          {/* Image output preview if present */}
+          {result.previewUrl && (
+            <div className="relative mt-3 flex justify-center overflow-hidden rounded-xl border border-border">
+              <Image
+                src={result.previewUrl}
+                alt={result.fileName}
+                width={400}
+                height={200}
+                unoptimized
+                className="max-h-36 w-auto object-contain"
+              />
+            </div>
+          )}
         </div>
-
-        {/* Text output preview if present */}
-        {result.textOutput && (
-          <div className="mt-3 max-h-36 overflow-auto rounded-xl bg-muted/50 p-3 font-mono text-xs text-foreground">
-            {result.textOutput}
-          </div>
-        )}
-
-        {/* Image output preview if present */}
-        {result.previewUrl && (
-          <div className="relative mt-3 flex justify-center overflow-hidden rounded-xl border border-border">
-            <Image
-              src={result.previewUrl}
-              alt={result.fileName}
-              width={400}
-              height={200}
-              unoptimized
-              className="max-h-36 w-auto object-contain"
-            />
-          </div>
-        )}
-      </div>
+      )}
 
       {/* Action Buttons */}
       <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
