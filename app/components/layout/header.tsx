@@ -121,7 +121,9 @@ export function Header({
             className="hidden items-center justify-center gap-1 md:flex"
           >
             {navLinks.map((link) => {
-              const isActive = pathname === link.href;
+              const isActive =
+                pathname === link.href ||
+                (link.href !== "/" && Boolean(pathname?.startsWith(link.href)));
               return (
                 <Link
                   key={link.label}
@@ -189,7 +191,9 @@ export function Header({
         <div className="border-t border-border bg-background/95 px-4 py-5 backdrop-blur-xl md:hidden animate-in fade-in slide-in-from-top-2 duration-200">
           <nav className="flex flex-col gap-1.5">
             {navLinks.map((link) => {
-              const isActive = pathname === link.href;
+              const isActive =
+                pathname === link.href ||
+                (link.href !== "/" && Boolean(pathname?.startsWith(link.href)));
               return (
                 <Link
                   key={link.label}
