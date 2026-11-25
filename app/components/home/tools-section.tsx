@@ -130,7 +130,7 @@ export function ToolsSection() {
       : allTools.filter((t) => t.category === activeCategory);
 
   return (
-    <section className="relative border-y border-border bg-muted/30 py-24 sm:py-32">
+    <section className="relative bg-muted/30 py-24 sm:py-32">
       {/* Background glow accent */}
       <div className="pointer-events-none absolute left-1/2 top-1/2 -z-10 h-[500px] w-[800px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary/5 blur-3xl" />
 
