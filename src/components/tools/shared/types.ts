@@ -32,6 +32,8 @@ export interface SplitOutputFile {
   formattedSize: string;
   pageCount: number;
   downloadUrl: string;
+  previewUrl?: string;
+  dimensions?: { width: number; height: number };
 }
 
 export interface ProcessingResult {

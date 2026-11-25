@@ -82,15 +82,33 @@ export function ResultPanel({
                   <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-md bg-muted text-[10px] font-mono font-semibold text-muted-foreground">
                     {idx + 1}
                   </span>
-                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-surface-blue text-primary">
-                    <FileText className="h-4 w-4" />
-                  </div>
+                  {file.previewUrl ? (
+                    <div className="relative flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-border bg-muted">
+                      <Image
+                        src={file.previewUrl}
+                        alt={file.name}
+                        width={32}
+                        height={32}
+                        unoptimized
+                        className="h-full w-full object-cover"
+                      />
+                    </div>
+                  ) : (
+                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-surface-blue text-primary">
+                      <FileText className="h-4 w-4" />
+                    </div>
+                  )}
                   <div className="min-w-0">
                     <p className="truncate text-xs font-semibold text-foreground">
                       {file.name}
                     </p>
                     <p className="text-[10px] text-muted-foreground">
-                      {file.formattedSize} • {file.pageCount} {file.pageCount === 1 ? "page" : "pages"}
+                      {file.formattedSize}
+                      {file.dimensions
+                        ? ` • ${file.dimensions.width}×${file.dimensions.height}px`
+                        : file.pageCount !== undefined
+                        ? ` • ${file.pageCount} ${file.pageCount === 1 ? "page" : "pages"}`
+                        : ""}
                     </p>
                   </div>
                 </div>
