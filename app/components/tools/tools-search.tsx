@@ -102,13 +102,6 @@ export function ToolsSearch({
             <X className="h-4 w-4" />
           </button>
         )}
-
-        {/* Keyboard shortcut indicator */}
-        <div className="hidden items-center gap-1 pl-2 sm:flex">
-          <kbd className="inline-flex h-6 items-center justify-center rounded-md border border-border bg-muted/60 px-2 font-mono text-[11px] font-semibold text-muted-foreground">
-            ⌘K
-          </kbd>
-        </div>
       </div>
 
       {/* Live Suggestions Dropdown while typing */}
