@@ -11,6 +11,7 @@ interface FileUploadProps {
   title?: string;
   description?: string;
   disabled?: boolean;
+  className?: string;
 }
 
 export function FileUpload({
@@ -21,6 +22,7 @@ export function FileUpload({
   title = "Drop your files here",
   description = "or click to browse from your device",
   disabled = false,
+  className = "",
 }: FileUploadProps) {
   const [isDragOver, setIsDragOver] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -68,19 +70,18 @@ export function FileUpload({
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       validateAndDispatch(e.target.files);
-      // Reset input value so same files can be re-selected if deleted
       e.target.value = "";
     }
   };
 
   return (
-    <div className="w-full">
+    <div className={`flex h-full w-full flex-1 flex-col ${className}`}>
       <div
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
         onClick={() => !disabled && fileInputRef.current?.click()}
-        className={`group relative flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed p-8 text-center transition-all duration-200 sm:p-12 ${
+        className={`group relative flex h-full min-h-[320px] flex-1 cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed p-8 text-center transition-all duration-200 sm:p-12 ${
           disabled
             ? "cursor-not-allowed opacity-50 bg-muted/20 border-border"
             : isDragOver

@@ -15,17 +15,17 @@ export function ToolWorkspace({
 }: ToolWorkspaceProps) {
   if (sidebar) {
     return (
-      <div className={`mt-8 grid grid-cols-1 gap-6 lg:grid-cols-12 ${className}`}>
+      <div className={`mt-8 grid grid-cols-1 items-stretch gap-6 lg:grid-cols-12 ${className}`}>
         {/* Main processing area */}
-        <div className="lg:col-span-8">
-          <div className="rounded-3xl border border-border bg-card p-6 shadow-sm sm:p-8">
+        <div className="flex flex-col lg:col-span-8">
+          <div className="flex h-full flex-1 flex-col rounded-3xl border border-border bg-card p-6 shadow-sm sm:p-8">
             {children}
           </div>
         </div>
 
         {/* Configuration / Options Sidebar */}
-        <div className="lg:col-span-4">
-          <div className="sticky top-24">{sidebar}</div>
+        <div className="flex flex-col lg:col-span-4">
+          <div className="h-full">{sidebar}</div>
         </div>
       </div>
     );

@@ -200,7 +200,7 @@ export default function MergePdfPage() {
 
   // Workspace Main Content
   const workspaceContent = (
-    <div className="space-y-6">
+    <div className="flex h-full flex-1 flex-col space-y-6">
       {status === "success" && result ? (
         <ResultPanel
           result={result}
