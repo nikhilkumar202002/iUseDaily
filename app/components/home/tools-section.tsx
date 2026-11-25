@@ -113,12 +113,12 @@ const allTools: ToolItem[] = [
   },
 ];
 
-const categoryTabs: { label: string; value: Category; count: number }[] = [
-  { label: "All Utilities", value: "ALL", count: 50 },
-  { label: "PDF Suite", value: "PDF", count: 14 },
-  { label: "Image Tools", value: "IMAGE", count: 12 },
-  { label: "Text & Code", value: "TEXT", count: 16 },
-  { label: "Calculators", value: "CALCULATOR", count: 8 },
+const categoryTabs: { label: string; value: Category }[] = [
+  { label: "All Utilities", value: "ALL" },
+  { label: "PDF Suite", value: "PDF" },
+  { label: "Image Tools", value: "IMAGE" },
+  { label: "Text & Code", value: "TEXT" },
+  { label: "Calculators", value: "CALCULATOR" },
 ];
 
 export function ToolsSection() {
@@ -149,7 +149,7 @@ export function ToolsSection() {
         </div>
 
         {/* Category Tabs (Centered) */}
-        <div className="mt-10 flex flex-wrap justify-center gap-2 border-b border-border pb-5">
+        <div className="mt-10 flex flex-wrap justify-center gap-2 pb-2">
           {categoryTabs.map((tab) => {
             const isSelected = activeCategory === tab.value;
             return (
@@ -157,20 +157,13 @@ export function ToolsSection() {
                 key={tab.value}
                 type="button"
                 onClick={() => setActiveCategory(tab.value)}
-                className={`flex items-center gap-2 rounded-full px-4 py-2 text-xs font-semibold transition-all ${
+                className={`rounded-full px-4 py-2 text-xs font-semibold transition-all ${
                   isSelected
                     ? "bg-foreground text-background shadow-md shadow-foreground/10"
                     : "border border-border bg-card text-muted-foreground hover:bg-muted hover:text-foreground"
                 }`}
               >
-                <span>{tab.label}</span>
-                <span
-                  className={`rounded-full px-1.5 py-0.2 text-[10px] ${
-                    isSelected ? "bg-background/20 text-background" : "bg-muted text-muted-foreground"
-                  }`}
-                >
-                  {tab.count}
-                </span>
+                {tab.label}
               </button>
             );
           })}
@@ -192,15 +185,6 @@ export function ToolsSection() {
                     <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-surface-blue text-primary transition-all duration-200 group-hover:scale-105 group-hover:bg-primary group-hover:text-primary-foreground group-hover:shadow-md group-hover:shadow-primary/20">
                       <Icon className="h-6 w-6" />
                     </span>
-                    {tool.badge && (
-                      <span
-                        className={`rounded-full border px-2.5 py-0.5 text-[11px] font-semibold ${
-                          tool.badgeColor || "bg-primary/10 text-primary border-primary/20"
-                        }`}
-                      >
-                        {tool.badge}
-                      </span>
-                    )}
                   </div>
 
                   {/* Tool info */}

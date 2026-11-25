@@ -85,9 +85,9 @@ export function Header({
   return (
     <header
       className={`sticky top-0 z-50 w-full transition-all duration-300 ease-out animate-in fade-in slide-in-from-top-4 duration-700 ${
-        isScrolled
-          ? "border-b border-border bg-background/85 backdrop-blur-xl shadow-sm shadow-black/5"
-          : "border-b border-transparent bg-background/60 backdrop-blur-md"
+        isScrolled || mobileMenuOpen
+          ? "bg-background/85 backdrop-blur-xl shadow-sm shadow-black/5"
+          : "bg-transparent"
       }`}
     >
       <div className="mx-auto flex h-18 max-w-7xl items-center px-4 sm:px-6 lg:px-8">
